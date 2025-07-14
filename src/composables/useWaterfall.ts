@@ -1,6 +1,17 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import type { WaterfallItem, WaterfallPosition } from '@/types'
 
+// 防抖函數，避免頻繁計算 Layout
+function debounce<F extends (...args: unknown[]) => unknown>(func: F, wait: number) {
+  let timer: NodeJS.Timeout
+  return function(this: ThisParameterType<F>, ...args: Parameters<F>) {
+    clearTimeout(timer)
+    timer = setTimeout(() => {
+      func.apply(this, args)
+    }, wait)
+  }
+}
+
 export function useWaterfall(
   items: WaterfallItem[],
   options: {
@@ -11,6 +22,8 @@ export function useWaterfall(
 ){
   // 容器元素
   const containerRef = ref<HTMLElement>()
+  // 容器寬度
+  const containerWidth = ref(0)
   // 項目位置
   const itemPositions = ref<Map<string | number, WaterfallPosition>>(new Map())
   // 容器高度
@@ -24,22 +37,23 @@ export function useWaterfall(
     minColumnWidth = 200, 
   } = options
 
+  // 更新容器寬度
+  const updateContainerWidth = () =>{
+    if(!containerRef.value) return
+    containerWidth.value = containerRef.value?.offsetWidth || 0
+  }
+
   // 計算實際可放入的列的數量
   const calculateColumns = computed(() => {
     if(!containerRef.value) return columns
-
-    const containerWidth = containerRef.value.offsetWidth
-    const availableColumns = Math.floor((containerWidth + gap) / (minColumnWidth + gap))
-
+    const availableColumns = Math.floor((containerWidth.value + gap) / (minColumnWidth + gap))
     return Math.max(Math.min(columns, availableColumns), 1)
   })
 
   // 計算每列的寬度
   const columnWidth = computed(() => {
     if(!containerRef.value) return minColumnWidth
-
-    const containerWidth = containerRef.value.offsetWidth
-    return (containerWidth - (calculateColumns.value - 1) * gap) / calculateColumns.value
+    return (containerWidth.value - (calculateColumns.value - 1) * gap) / calculateColumns.value
   })
 
   // 計算Layout 
@@ -71,6 +85,7 @@ export function useWaterfall(
     containerHeight.value = Math.max(...columnHeights)
     isLoading.value = false
   }
+  const debouncedCalculateLayout = debounce(calculateLayout, 300)
 
   // 取得圖片高度，或預設高度
   const getImageHeight = (src: string, width: number):
@@ -90,11 +105,13 @@ export function useWaterfall(
 
   // 監聽容器寬度變化
   const handleResize = () => {
-    calculateLayout()
+    updateContainerWidth()
+    debouncedCalculateLayout()
   }
 
   onMounted(() => {
-    calculateLayout()
+    updateContainerWidth()
+    debouncedCalculateLayout()
     window.addEventListener('resize', handleResize)
   })
 
