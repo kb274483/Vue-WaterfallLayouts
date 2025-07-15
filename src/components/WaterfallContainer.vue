@@ -4,21 +4,37 @@
     class="waterfall-container"
     :style="{height: `${containerHeight}px`}"
   >
+    <template v-if="!isInit && items.length > 0">
+      <div
+        v-for="(item, index) in items"
+        :key="`skeleton-${item.id}`"
+        class="waterfall-skeleton"
+        :style="getSkeletonStyle(index)"
+      >
+        <div class="skeleton-image"></div>
+        <div class="skeleton-content">
+          <div class="skeleton-line skeleton-line-short"></div>
+          <div class="skeleton-line"></div>
+        </div>
+      </div>
+    </template>
+    
     <!-- waterfall items -->
-    <div
-      v-for="item in items"
-      :key="item.id"
-      class="waterfall-item"
-      :style="getItemStyle(item)"
-    >
-      <img
-        :src="item.src"
-        :alt="item.alt || ''"
-        class="waterfall-image"
-        @load="onImageLoad"
-        @error="onImageError"
-      />
-    </div>
+    <template v-else>
+      <div
+        v-for="item in items"
+        :key="item.id"
+        class="waterfall-item"
+        :style="getItemStyle(item)"
+      >
+        <img
+          :src="item.src"
+          :alt="item.alt || ''"
+          class="waterfall-image"
+          @error="onImageError"
+        />
+      </div>
+    </template>
 
     <div v-if="isLoading">
       Loading...
@@ -27,11 +43,12 @@
 </template>
 
 <script setup lang="ts">
-  import { watch } from 'vue'
+  import { ref, watch } from 'vue'
   import { useWaterfall } from '@/composables/useWaterfall'
   import type { WaterfallItem, WaterfallProps } from '@/types'
 
   const props = defineProps<WaterfallProps>()
+  const isInit = ref(false)
 
   const {
     containerRef,
@@ -44,6 +61,27 @@
     gap: props.gap,
     minColumnWidth: props.minColumnWidth,
   })
+
+  const getSkeletonStyle = (index: number) => {
+    // 網格設定
+    const columns = props.columns || 3
+    const gap = props.gap || 10
+    const columnIndex = index % columns
+    const rowIndex = Math.floor(index / columns)
+    
+    // 計算位置
+    const width = `calc((100% - ${gap * (columns - 1)}px) / ${columns})`
+    const left = `calc(${columnIndex} * (100% / ${columns}) + ${columnIndex * gap}px)`
+    const top = `${rowIndex * 250 + rowIndex * gap}px` 
+    
+    return {
+      position: 'absolute' as const,
+      width,
+      left,
+      top,
+      height: '200px',
+    }
+  }
 
   const getItemStyle = (item: WaterfallItem) =>{
     const position = itemPositions.value.get(item.id)
@@ -59,18 +97,29 @@
     }
   }
 
-  const onImageLoad = ()=>{
-    calculateLayout()
-  }
+  // const onImageLoad = ()=>{
+  //   calculateLayout()
+  // }
 
   const onImageError = (event: Event)=>{
     const img = event.target as HTMLImageElement
     img.style.opacity = '0'
   }
 
-  watch(()=> props.items, ()=>{
+  watch(itemPositions, (newPositions) => {
+  if (newPositions.size > 0 && !isInit.value) {
+    setTimeout(() => {
+      isInit.value = true
+    }, 100)
+  }
+}, { immediate: true })
+
+  watch(() => props.items, (newItems, oldItems) => {
+    if (newItems.length !== oldItems?.length) {
+      isInit.value = false
+    }
     calculateLayout()
-  }, {deep: true})
+  }, { deep: true })
 
 </script>
 
@@ -100,6 +149,39 @@
   border-radius: 8px;
 }
 
+.waterfall-skeleton {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-image {
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+.skeleton-content {
+  padding: 12px;
+}
+
+.skeleton-line {
+  height: 12px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.skeleton-line-short {
+  width: 60%;
+}
+
 .waterfall-loading {
   position: absolute;
   top: 50%;
@@ -126,6 +208,27 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes skeleton-pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 </style>

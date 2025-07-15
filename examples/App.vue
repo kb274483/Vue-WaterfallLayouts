@@ -31,6 +31,6 @@ const testImages = ref([
   width: 80vw;
   height: 100%;
   margin: 0 auto;
-  background-color: #f0f0f0;
+  /* background-color: #f0f0f0; */
 }
 </style>
