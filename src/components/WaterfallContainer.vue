@@ -55,6 +55,8 @@
     itemPositions,
     containerHeight,
     isLoading,
+    isAnimating,
+    transformPositions,
     calculateLayout,
   } = useWaterfall(props.items,{
     columns: props.columns,
@@ -83,18 +85,34 @@
     }
   }
 
-  const getItemStyle = (item: WaterfallItem) =>{
+  const getItemStyle = (item: WaterfallItem) => {
     const position = itemPositions.value.get(item.id)
-    if(!position) return {}
+    if (!position) return {}
 
-    return {
+    const transform = transformPositions.value.get(item.id)
+    const baseStyle = {
       position: 'absolute' as const,
       left: `${position.x}px`,
       top: `${position.y}px`,
       width: `${position.width}px`,
+      maxWidth: `${position.width}px`,
       opacity: 1,
       transition: 'all 0.3s ease',
     }
+
+    // 增加transform 動畫
+    if (isAnimating.value && transform) {
+      return {
+        ...baseStyle,
+        transform: `
+          translate(${-transform.deltaX}px, ${-transform.deltaY}px)
+          scale(${transform.scaleX}, ${transform.scaleY})
+        `,
+        transformOrigin: 'left top'
+      }
+    }
+
+    return baseStyle
   }
 
   // const onImageLoad = ()=>{
@@ -136,6 +154,8 @@
   background-color: #fff;
   cursor: pointer;
   transition: all 0.3s ease;
+  transform-origin: left top;
+  will-change: transform;
 }
 .waterfall-item:hover {
   transform: translateY(-2px);

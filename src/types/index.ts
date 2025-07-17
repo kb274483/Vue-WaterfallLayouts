@@ -22,3 +22,11 @@ export interface WaterfallPosition {
   width: number
   height: number
 }
+
+// 動畫變形位置
+export interface AnimationOffset {
+  deltaX: number
+  deltaY: number
+  scaleX: number
+  scaleY: number
+}
