@@ -2,7 +2,7 @@
   <div>
     <h1>Waterfall 開發測試</h1>
     <div class="mainContainer">
-      <WaterfallContainer :items="testImages" />
+      <WaterfallContainer :items="testImages" :columns="4" />
     </div>
   </div>
 </template>

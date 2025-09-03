@@ -13,6 +13,9 @@ export interface WaterfallProps {
   columns?: number
   gap?: number
   minColumnWidth?: number
+  hoverEffect?: boolean
+  hoverFunction?: (item: WaterfallItem) => void
+  clickFunction?: (item: WaterfallItem) => void
 }
 
 // 項目位置

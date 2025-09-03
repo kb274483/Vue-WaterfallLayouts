@@ -31,35 +31,38 @@
           :src="item.src"
           :alt="item.alt || ''"
           class="waterfall-image"
+          loading="lazy"
           @error="onImageError"
         />
       </div>
     </template>
 
-    <div v-if="isLoading">
-      Loading...
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, watch } from 'vue'
+  import { ref, watch, withDefaults } from 'vue'
   import { useWaterfall } from '@/composables/useWaterfall'
   import type { WaterfallItem, WaterfallProps } from '@/types'
 
-  const props = defineProps<WaterfallProps>()
+  const props = withDefaults(defineProps<WaterfallProps>(), {
+    columns: 3,
+    gap: 10,
+    minColumnWidth: 200,
+    hoverEffect: true
+  })
   const isInit = ref(false)
 
   const {
     containerRef,
     itemPositions,
     containerHeight,
-    isLoading,
     calculateLayout,
   } = useWaterfall(props.items,{
     columns: props.columns,
     gap: props.gap,
     minColumnWidth: props.minColumnWidth,
+    hoverEffect: props.hoverEffect,
   })
 
   const getSkeletonStyle = (index: number) => {
@@ -86,8 +89,12 @@
   const getItemStyle = (item: WaterfallItem) =>{
     const position = itemPositions.value.get(item.id)
     if(!position) return {}
+    const hoverTranslate = props.hoverEffect ? "-3px" : "0px"
+    const hoverScale = props.hoverEffect ? "1.01" : "1"
 
     return {
+      "--hover-translate": hoverTranslate,
+      "--hover-scale": hoverScale,
       position: 'absolute' as const,
       left: `${position.x}px`,
       top: `${position.y}px`,
@@ -124,6 +131,10 @@
 </script>
 
 <style scoped>
+:root{
+  --hover-translate: 0;
+  --hover-scale: 1.01;
+}
 .waterfall-container{
   position: relative;
   width: 100%;
@@ -138,7 +149,7 @@
   transition: all 0.3s ease;
 }
 .waterfall-item:hover {
-  transform: translateY(-2px);
+  transform: translateY(var(--hover-translate)) scale(var(--hover-scale));
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 

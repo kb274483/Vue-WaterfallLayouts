@@ -18,6 +18,7 @@ export function useWaterfall(
     columns?: number
     gap?: number
     minColumnWidth?: number
+    hoverEffect?: boolean
   }
 ){
   // 容器元素
@@ -35,6 +36,7 @@ export function useWaterfall(
     columns = 3, 
     gap = 10, 
     minColumnWidth = 200, 
+    hoverEffect = true,
   } = options
 
   // 更新容器寬度
@@ -124,6 +126,7 @@ export function useWaterfall(
     itemPositions,
     containerHeight,
     isLoading,
+    hoverEffect,
     calculateLayout,
   }
 }
