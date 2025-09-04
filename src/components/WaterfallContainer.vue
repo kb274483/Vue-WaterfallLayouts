@@ -26,14 +26,20 @@
         :key="item.id"
         class="waterfall-item"
         :style="getItemStyle(item)"
-      >
-        <img
-          :src="item.src"
-          :alt="item.alt || ''"
-          class="waterfall-image"
-          loading="lazy"
-          @error="onImageError"
-        />
+        @click="handleItemClick(item)"
+        @mouseenter="handleItemHover(item)"
+        >
+        <!-- @mouseleave="handleItemLeave(item)" -->
+        <!-- 使用 slot 讓使用者自訂內容 -->
+        <slot :item="item" :index="items.indexOf(item)">
+          <img
+            :src="item.src"
+            :alt="item.alt || ''"
+            class="waterfall-image"
+            loading="lazy"
+            @error="onImageError"
+          />
+        </slot>
       </div>
     </template>
 
@@ -104,10 +110,6 @@
     }
   }
 
-  // const onImageLoad = ()=>{
-  //   calculateLayout()
-  // }
-
   const onImageError = (event: Event)=>{
     const img = event.target as HTMLImageElement
     img.style.opacity = '0'
@@ -127,6 +129,27 @@
     }
     calculateLayout()
   }, { deep: true })
+
+  // 點擊事件
+  const handleItemClick = (item: WaterfallItem) => {
+    if (props.clickFunction) {
+      props.clickFunction(item)
+    }
+  }
+
+  // hover 事件
+  const handleItemHover = (item: WaterfallItem) => {
+    if (props.hoverFunction) {
+      props.hoverFunction(item)
+    }
+  }
+
+  // hover 離開事件
+  // const handleItemLeave = (item: WaterfallItem) => {
+  //   if (props.hoverLeaveFunction) {
+  //     props.hoverLeaveFunction(item)
+  //   }
+  // }
 
 </script>
 

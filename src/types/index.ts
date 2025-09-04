@@ -5,6 +5,7 @@ export interface WaterfallItem {
   alt?: string
   width?: number
   height?: number
+  [key: string]: unknown
 }
 
 // 組件屬性
@@ -16,6 +17,7 @@ export interface WaterfallProps {
   hoverEffect?: boolean
   hoverFunction?: (item: WaterfallItem) => void
   clickFunction?: (item: WaterfallItem) => void
+  hoverLeaveFunction?: (item: WaterfallItem) => void
 }
 
 // 項目位置
