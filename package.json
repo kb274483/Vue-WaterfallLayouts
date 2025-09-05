@@ -1,18 +1,44 @@
 {
   "name": "vue-waterfall-layout",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "一個簡易的 Vue 3 瀑布流布局組件，支援響應式設計和Slot自定義內容",
+  "main": "dist/vue-waterfall.umd.js",
+  "module": "dist/vue-waterfall.es.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "vue",
+    "vue3",
+    "waterfall",
+    "layout",
+    "masonry",
+    "responsive",
+    "component"
+  ],
+  "author": "Roy <kb274483@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kb274483/Vue-WaterfallLayouts.git"
+  },
+  "homepage": "https://github.com/kb274483/Vue-WaterfallLayouts",
+  "bugs": {
+    "url": "https://github.com/kb274483/Vue-WaterfallLayouts/issues"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "PLAYGROUND=1 vite",
-    "build": "vite build && tsc --emitDeclarationOnly",
+    "build": "vite build && tsc --project tsconfig.build.json",
     "preview": "vite preview",
-    "lint": "eslint --ext .ts,.vue src examples"
+    "lint": "eslint --ext .ts,.vue src examples",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
     "@types/node": "^24.0.12",

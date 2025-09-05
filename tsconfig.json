@@ -115,5 +115,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "examples"]
+  "include": ["src/**/*"],
+  "exclude": ["examples", "dist", "node_modules"]
 }

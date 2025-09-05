@@ -1,0 +1,16 @@
+# 開發相關檔案
+src/
+examples/
+node_modules/
+.env
+.DS_Store
+*.log
+
+# 設定檔案
+vite.config.ts
+tsconfig.json
+eslint.config.mjs
+
+# Git 相關
+.git/
+.gitignore
