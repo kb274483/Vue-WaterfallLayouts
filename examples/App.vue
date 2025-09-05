@@ -5,6 +5,7 @@
       <WaterfallContainer 
         :items="testImages" 
         :columns="4"
+        :fade-in-and-out="true"
         :click-function="handleItemClick"
         :hover-function="handleItemHover"
         :hover-leave-function="handleItemLeave"

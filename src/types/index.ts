@@ -15,6 +15,7 @@ export interface WaterfallProps {
   gap?: number
   minColumnWidth?: number
   hoverEffect?: boolean
+  fadeInAndOut?: boolean
   hoverFunction?: (item: WaterfallItem) => void
   clickFunction?: (item: WaterfallItem) => void
   hoverLeaveFunction?: (item: WaterfallItem) => void

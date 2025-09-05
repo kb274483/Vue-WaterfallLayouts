@@ -20,29 +20,32 @@
     </template>
     
     <!-- waterfall items -->
-    <template v-else>
-      <div
-        v-for="item in items"
-        :key="item.id"
-        class="waterfall-item"
-        :style="getItemStyle(item)"
-        @click="handleItemClick(item)"
-        @mouseenter="handleItemHover(item)"
-        >
-        <!-- @mouseleave="handleItemLeave(item)" -->
-        <!-- 使用 slot 讓使用者自訂內容 -->
-        <slot :item="item" :index="items.indexOf(item)">
-          <img
-            :src="item.src"
-            :alt="item.alt || ''"
-            class="waterfall-image"
-            loading="lazy"
-            @error="onImageError"
-          />
-        </slot>
-      </div>
-    </template>
-
+    <div
+      v-for="(item, index) in items"
+      class="waterfall-item"
+      :key="item.id"
+      :class="{
+        'is-hidden' : !isInit,
+        fadeInOut: props.fadeInAndOut,
+        'in-view' : visibleItemIds.has(item.id) && props.fadeInAndOut,
+      }"
+      :style="getItemStyle(item)"
+      :ref="(el) => setItemRef(el as HTMLElement, item)"
+      @click="handleItemClick(item)"
+      @mouseenter="handleItemHover(item)"
+      @mouseleave="handleItemLeave(item)"
+    >
+      <!-- slot 自訂內容 -->
+      <slot :item="item" :index="index">
+        <img
+          :src="item.src"
+          :alt="item.alt || ''"
+          class="waterfall-image"
+          loading="lazy"
+          @error="onImageError"
+        />
+      </slot>
+    </div>
   </div>
 </template>
 
@@ -55,7 +58,8 @@
     columns: 3,
     gap: 10,
     minColumnWidth: 200,
-    hoverEffect: true
+    hoverEffect: true,
+    fadeInAndOut: false,
   })
   const isInit = ref(false)
 
@@ -64,11 +68,15 @@
     itemPositions,
     containerHeight,
     calculateLayout,
+    setItemRef,
+    renderColumnWidth,
+    visibleItemIds,
   } = useWaterfall(props.items,{
     columns: props.columns,
     gap: props.gap,
     minColumnWidth: props.minColumnWidth,
     hoverEffect: props.hoverEffect,
+    fadeInAndOut: props.fadeInAndOut,
   })
 
   const getSkeletonStyle = (index: number) => {
@@ -94,19 +102,23 @@
 
   const getItemStyle = (item: WaterfallItem) =>{
     const position = itemPositions.value.get(item.id)
-    if(!position) return {}
     const hoverTranslate = props.hoverEffect ? "-3px" : "0px"
     const hoverScale = props.hoverEffect ? "1.01" : "1"
 
-    return {
+    const baseStyle = {
       "--hover-translate": hoverTranslate,
       "--hover-scale": hoverScale,
+      width: `${renderColumnWidth.value}px`,
+    } as const
+
+    if(!position) return baseStyle
+
+    return {
+      ...baseStyle,
       position: 'absolute' as const,
       left: `${position.x}px`,
       top: `${position.y}px`,
-      width: `${position.width}px`,
-      opacity: 1,
-      transition: 'all 0.3s ease',
+      ...(props.fadeInAndOut ? {} : {opacity: 1}),
     }
   }
 
@@ -116,12 +128,12 @@
   }
 
   watch(itemPositions, (newPositions) => {
-  if (newPositions.size > 0 && !isInit.value) {
-    setTimeout(() => {
-      isInit.value = true
-    }, 100)
-  }
-}, { immediate: true })
+    if (newPositions.size > 0 && !isInit.value) {
+      setTimeout(() => {
+        isInit.value = true
+      }, 100)
+    }
+  }, { immediate: true })
 
   watch(() => props.items, (newItems, oldItems) => {
     if (newItems.length !== oldItems?.length) {
@@ -145,11 +157,11 @@
   }
 
   // hover 離開事件
-  // const handleItemLeave = (item: WaterfallItem) => {
-  //   if (props.hoverLeaveFunction) {
-  //     props.hoverLeaveFunction(item)
-  //   }
-  // }
+  const handleItemLeave = (item: WaterfallItem) => {
+    if (props.hoverLeaveFunction) {
+      props.hoverLeaveFunction(item)
+    }
+  }
 
 </script>
 
@@ -174,6 +186,17 @@
 .waterfall-item:hover {
   transform: translateY(var(--hover-translate)) scale(var(--hover-scale));
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transition: left 0.3s ease, top 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+}
+
+.waterfall-item.fadeInOut {
+  opacity: 0;
+  transform: translateY(20px);
+  will-change: opacity, transform;
+}
+.waterfall-item.fadeInOut.in-view {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .waterfall-image {
@@ -237,6 +260,10 @@
   border-top: 2px solid #3498db;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+.is-hidden {
+  visibility: hidden;
 }
 
 @keyframes spin {
