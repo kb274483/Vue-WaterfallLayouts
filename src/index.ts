@@ -1,6 +1,5 @@
 import type { App } from 'vue'
 import WaterfallContainer from '@/components/WaterfallContainer.vue'
-import './style.css'
 
 export { WaterfallContainer }
 
