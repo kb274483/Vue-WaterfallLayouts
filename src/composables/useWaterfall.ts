@@ -130,8 +130,8 @@ export function useWaterfall(
       }
     }, {
       root: containerRef.value ?? null,
-      rootMargin: '0px',
-      threshold: 0.2,
+      rootMargin: '10px 0px',
+      threshold: 0,
     })
   }
   
