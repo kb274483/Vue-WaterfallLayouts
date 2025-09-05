@@ -11,6 +11,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 // 引入
 import VueWaterfall from 'vue-responsive-waterfall'
+import 'vue-responsive-waterfall/dist/vue-responsive-waterfall.css'
 
 const app = createApp(App)
 app.use(VueWaterfall)
