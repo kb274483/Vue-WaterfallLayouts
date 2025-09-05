@@ -3,7 +3,7 @@
 ## 安裝
 
 ```bash
-npm install vue-waterfall-layout
+npm i vue-responsive-waterfall
 ```
 
 ## 基本使用
