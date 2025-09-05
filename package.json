@@ -1,6 +1,6 @@
 {
   "name": "vue-responsive-waterfall",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "一個簡易的 Vue 3 瀑布流布局組件，支援響應式設計和Slot自定義內容",
   "main": "dist/vue-waterfall.umd.js",
   "module": "dist/vue-waterfall.es.js",
