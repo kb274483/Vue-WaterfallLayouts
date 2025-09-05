@@ -5,6 +5,17 @@
 ```bash
 npm i vue-responsive-waterfall
 ```
+```javascript
+// main.js
+import { createApp } from 'vue'
+import App from './App.vue'
+// 引入
+import VueWaterfall from 'vue-responsive-waterfall'
+
+const app = createApp(App)
+app.use(VueWaterfall)
+app.mount('#app')
+```
 
 ## 基本使用
 
