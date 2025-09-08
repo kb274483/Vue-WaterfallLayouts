@@ -184,9 +184,8 @@
   transition: all 0.3s ease;
 }
 .waterfall-item:hover {
-  transform: translateY(var(--hover-translate)) scale(var(--hover-scale));
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  transition: left 0.3s ease, top 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .waterfall-item.fadeInOut {
@@ -194,9 +193,14 @@
   transform: translateY(20px);
   will-change: opacity, transform;
 }
+
 .waterfall-item.fadeInOut.in-view {
   opacity: 1;
   transform: translateY(0);
+}
+
+.waterfall-item.fadeInOut.in-view:hover {
+  transform: translateY(var(--hover-translate)) scale(var(--hover-scale));
 }
 
 .waterfall-image {
